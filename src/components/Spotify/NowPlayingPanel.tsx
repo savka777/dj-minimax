@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import type { SpotifyTrack } from '@/lib/spotify/tracks';
-import { DJAvatar } from './DJAvatar';
+import { VoicePoweredOrb } from '@/components/ui/voice-powered-orb';
 
 type DJSegment = 'dj_intro' | 'ai_song' | 'dj_outro';
 
@@ -36,7 +36,7 @@ export function NowPlayingPanel({ track, isDJPlaying, djSegment }: NowPlayingPan
     );
   }
 
-  // DJ Mode - show DJ avatar and info
+  // DJ Mode - show animated orb and info
   if (isDJPlaying) {
     return (
       <aside className="hidden w-80 flex-shrink-0 flex-col overflow-y-auto bg-zinc-900 lg:flex rounded-lg transition-shadow duration-300 animate-dj-glow">
@@ -50,9 +50,17 @@ export function NowPlayingPanel({ track, isDJPlaying, djSegment }: NowPlayingPan
           </div>
         </div>
 
-        {/* DJ Avatar - centered */}
+        {/* Animated Orb - centered */}
         <div className="flex items-center justify-center mx-4 aspect-square">
-          <DJAvatar size="lg" isSpeaking={true} />
+          <div className="w-64 h-64 relative">
+            <VoicePoweredOrb
+              enableVoiceControl={false}
+              hue={280}
+              maxRotationSpeed={1.5}
+              maxHoverIntensity={0.6}
+              className="rounded-full overflow-hidden"
+            />
+          </div>
         </div>
 
         {/* DJ Info */}
@@ -153,7 +161,7 @@ export function NowPlayingPanel({ track, isDJPlaying, djSegment }: NowPlayingPan
             </div>
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium text-white">{track!.title}</p>
-              <p className="truncate text-xs text-zinc-400">{track!.artist} • Official Video</p>
+              <p className="truncate text-xs text-zinc-400">{track!.artist} - Official Video</p>
             </div>
           </div>
 
@@ -174,7 +182,7 @@ export function NowPlayingPanel({ track, isDJPlaying, djSegment }: NowPlayingPan
             </div>
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium text-white">{track!.title} (Live)</p>
-              <p className="truncate text-xs text-zinc-400">{track!.artist} • Live Performance</p>
+              <p className="truncate text-xs text-zinc-400">{track!.artist} - Live Performance</p>
             </div>
           </div>
         </div>

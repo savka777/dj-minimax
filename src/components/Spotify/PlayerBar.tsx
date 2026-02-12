@@ -2,7 +2,6 @@
 
 import Image from 'next/image';
 import type { SpotifyTrack } from '@/lib/spotify/tracks';
-import { DJAvatar } from './DJAvatar';
 
 type DJSegment = 'dj_intro' | 'ai_song' | 'dj_outro';
 
@@ -43,6 +42,28 @@ function formatTime(seconds: number): string {
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 }
 
+// Simple CSS-animated DJ orb for the player bar
+function DJOrbSmall({ isPlaying }: { isPlaying: boolean }) {
+  return (
+    <div className="relative h-14 w-14 flex-shrink-0 flex items-center justify-center">
+      {/* Animated pulse rings */}
+      {isPlaying && (
+        <>
+          <div className="absolute inset-0 rounded-full bg-purple-500/20 animate-dj-pulse" />
+          <div className="absolute inset-1 rounded-full bg-purple-500/30 animate-dj-pulse-delayed" />
+        </>
+      )}
+      {/* Inner orb */}
+      <div className="relative h-10 w-10 rounded-full bg-gradient-to-br from-purple-400 via-purple-600 to-indigo-800 flex items-center justify-center shadow-lg shadow-purple-500/30">
+        {/* Headphones icon */}
+        <svg className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 1c-4.97 0-9 4.03-9 9v7c0 1.66 1.34 3 3 3h3v-8H5v-2c0-3.87 3.13-7 7-7s7 3.13 7 7v2h-4v8h3c1.66 0 3-1.34 3-3v-7c0-4.97-4.03-9-9-9z" />
+        </svg>
+      </div>
+    </div>
+  );
+}
+
 export function PlayerBar({
   track,
   isPlaying,
@@ -68,7 +89,7 @@ export function PlayerBar({
       <div className="flex w-[30%] min-w-[180px] items-center gap-3">
         {isDJPlaying ? (
           <>
-            <DJAvatar size="sm" isSpeaking={isPlaying} />
+            <DJOrbSmall isPlaying={isPlaying} />
             <div className="min-w-0">
               <p className="truncate text-sm font-medium text-purple-400">
                 DJ Minimax

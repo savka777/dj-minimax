@@ -54,3 +54,23 @@ body {
 .animate-pulse-ring {
   animation: pulse-ring 1.5s ease-out infinite;
 }
+
+/* Small DJ orb pulse animation for player bar */
+@keyframes dj-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.7;
+  }
+}
+
+.animate-dj-pulse {
+  animation: dj-pulse 1.5s ease-in-out infinite;
+}
+
+.animate-dj-pulse-delayed {
+  animation: dj-pulse 1.5s ease-in-out infinite 0.5s;
+}

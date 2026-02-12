@@ -43,6 +43,8 @@ export default function Home() {
   const djInjectedRef = useRef(false);
   // Track whether we've initialized the queue
   const queueInitializedRef = useRef(false);
+  // Track the index where DJ was triggered (to resume from next track after skipping)
+  const djTriggerIndexRef = useRef(4); // Default to trigger index
 
   // Initialize queue when tracks are loaded - Spotify tracks first
   useEffect(() => {
@@ -60,7 +62,9 @@ export default function Home() {
 
     if (djStatus === 'ready' && djContent && !djInjectedRef.current) {
       djInjectedRef.current = true;
-      console.log('[Home] Injecting DJ content:', djContent.length, 'items');
+      // Store the current track index so we can resume after DJ
+      djTriggerIndexRef.current = fallbackPlayer.currentIndex;
+      console.log('[Home] Injecting DJ content:', djContent.length, 'items, triggered at index:', djTriggerIndexRef.current);
 
       // Pause Spotify if it's playing
       if (spotifyPlayer.isPlaying) {
@@ -156,8 +160,24 @@ export default function Home() {
   };
 
   const handleNext = () => {
-    console.log('[Page] handleNext called, useSpotify:', useSpotify, 'trackPlayCount:', trackPlayCount);
+    console.log('[Page] handleNext called, useSpotify:', useSpotify, 'trackPlayCount:', trackPlayCount, 'isDJPlaying:', isDJPlaying);
     setTrackPlayCount(prev => prev + 1);
+
+    // If DJ is playing, skip all DJ content and return to regular tracks
+    if (isDJPlaying) {
+      console.log('[Page] Skipping DJ content, returning to track list');
+      // Restore the original track queue
+      const spotifyQueueItems = tracks.map(spotifyTrackToQueueItem);
+      fallbackPlayer.setQueue(spotifyQueueItems);
+      // Play the track after where DJ was triggered
+      const resumeIndex = Math.min(djTriggerIndexRef.current + 1, tracks.length - 1);
+      console.log('[Page] Resuming at track index:', resumeIndex);
+      // Need to wait for queue to be set, then play at index
+      setTimeout(() => {
+        fallbackPlayer.playAtIndex(resumeIndex);
+      }, 100);
+      return;
+    }
 
     if (useSpotify) {
       const nextIndex = spotifyTrackIndex + 1;
