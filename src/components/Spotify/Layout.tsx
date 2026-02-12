@@ -7,6 +7,8 @@ import { PlayerBar } from './PlayerBar';
 import { NowPlayingPanel } from './NowPlayingPanel';
 import type { SpotifyTrack } from '@/lib/spotify/tracks';
 
+type DJSegment = 'dj_intro' | 'ai_song' | 'dj_outro';
+
 interface LayoutProps {
   children: ReactNode;
   currentTrack: SpotifyTrack | null;
@@ -24,6 +26,7 @@ interface LayoutProps {
   onSeek: (time: number) => void;
   djStatus?: 'idle' | 'generating' | 'ready' | 'error';
   isDJPlaying?: boolean;
+  djSegment?: DJSegment;
   isAuthenticated?: boolean;
   onLogin?: () => void;
   onLogout?: () => void;
@@ -46,6 +49,7 @@ export function Layout({
   onSeek,
   djStatus,
   isDJPlaying,
+  djSegment,
   isAuthenticated,
   onLogin,
   onLogout,
@@ -66,7 +70,7 @@ export function Layout({
         </main>
 
         {/* Now Playing Panel - 320px */}
-        <NowPlayingPanel track={currentTrack} isDJPlaying={isDJPlaying} />
+        <NowPlayingPanel track={currentTrack} isDJPlaying={isDJPlaying} djSegment={djSegment} />
       </div>
 
       {/* Fixed bottom player bar */}
@@ -78,6 +82,8 @@ export function Layout({
         volume={volume}
         currentIndex={currentIndex}
         queueLength={queueLength}
+        isDJPlaying={isDJPlaying}
+        djSegment={djSegment}
         onPlay={onPlay}
         onPause={onPause}
         onNext={onNext}

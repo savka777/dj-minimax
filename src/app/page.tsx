@@ -115,9 +115,13 @@ export default function Home() {
   const volume = useSpotify ? spotifyPlayer.volume : fallbackPlayer.volume;
 
   // Check if DJ content is currently playing (for glow effect)
-  const isDJPlaying = fallbackPlayer.currentItem?.type === 'dj_intro' ||
-    fallbackPlayer.currentItem?.type === 'ai_song' ||
-    fallbackPlayer.currentItem?.type === 'dj_outro';
+  const currentItemType = fallbackPlayer.currentItem?.type;
+  const isDJPlaying = currentItemType === 'dj_intro' ||
+    currentItemType === 'ai_song' ||
+    currentItemType === 'dj_outro';
+
+  // Get the current DJ segment type for display
+  const djSegment = isDJPlaying ? currentItemType as 'dj_intro' | 'ai_song' | 'dj_outro' : undefined;
 
   // Handle track selection - play via Spotify if authenticated
   const handleTrackSelect = (track: SpotifyTrack, index: number) => {
@@ -220,6 +224,7 @@ export default function Home() {
       onSeek={handleSeek}
       djStatus={djStatus}
       isDJPlaying={isDJPlaying}
+      djSegment={djSegment}
       isAuthenticated={spotifyPlayer.isAuthenticated}
       onLogin={spotifyPlayer.login}
       onLogout={spotifyPlayer.logout}

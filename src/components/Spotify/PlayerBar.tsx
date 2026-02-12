@@ -2,6 +2,9 @@
 
 import Image from 'next/image';
 import type { SpotifyTrack } from '@/lib/spotify/tracks';
+import { DJAvatar } from './DJAvatar';
+
+type DJSegment = 'dj_intro' | 'ai_song' | 'dj_outro';
 
 interface PlayerBarProps {
   track: SpotifyTrack | null;
@@ -11,12 +14,27 @@ interface PlayerBarProps {
   volume: number;
   currentIndex?: number;
   queueLength?: number;
+  isDJPlaying?: boolean;
+  djSegment?: DJSegment;
   onPlay: () => void;
   onPause: () => void;
   onNext: () => void;
   onPrevious: () => void;
   onVolumeChange: (volume: number) => void;
   onSeek: (time: number) => void;
+}
+
+function getDJSegmentLabel(segment?: DJSegment): string {
+  switch (segment) {
+    case 'dj_intro':
+      return 'Intro';
+    case 'ai_song':
+      return 'AI Song';
+    case 'dj_outro':
+      return 'Outro';
+    default:
+      return 'Playing';
+  }
 }
 
 function formatTime(seconds: number): string {
@@ -33,6 +51,8 @@ export function PlayerBar({
   volume,
   currentIndex = 0,
   queueLength = 0,
+  isDJPlaying,
+  djSegment,
   onPlay,
   onPause,
   onNext,
@@ -46,7 +66,19 @@ export function PlayerBar({
     <div className="flex h-[90px] items-center justify-between border-t border-zinc-800 bg-black px-4">
       {/* Now playing info (left) */}
       <div className="flex w-[30%] min-w-[180px] items-center gap-3">
-        {track ? (
+        {isDJPlaying ? (
+          <>
+            <DJAvatar size="sm" isSpeaking={isPlaying} />
+            <div className="min-w-0">
+              <p className="truncate text-sm font-medium text-purple-400">
+                DJ Minimax
+              </p>
+              <p className="truncate text-xs text-purple-300">
+                {getDJSegmentLabel(djSegment)}
+              </p>
+            </div>
+          </>
+        ) : track ? (
           <>
             <div className="relative h-14 w-14 flex-shrink-0 overflow-hidden rounded">
               <Image

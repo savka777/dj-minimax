@@ -6,3 +6,4 @@ export { PlayerBar } from './PlayerBar';
 export { TrackRow } from './TrackRow';
 export { NowPlayingPanel } from './NowPlayingPanel';
 export { AlbumArtGrid } from './AlbumArtGrid';
+export { DJAvatar } from './DJAvatar';

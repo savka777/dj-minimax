@@ -2,14 +2,31 @@
 
 import Image from 'next/image';
 import type { SpotifyTrack } from '@/lib/spotify/tracks';
+import { DJAvatar } from './DJAvatar';
+
+type DJSegment = 'dj_intro' | 'ai_song' | 'dj_outro';
 
 interface NowPlayingPanelProps {
   track: SpotifyTrack | null;
   isDJPlaying?: boolean;
+  djSegment?: DJSegment;
 }
 
-export function NowPlayingPanel({ track, isDJPlaying }: NowPlayingPanelProps) {
-  if (!track) {
+function getDJSegmentLabel(segment?: DJSegment): string {
+  switch (segment) {
+    case 'dj_intro':
+      return 'Intro';
+    case 'ai_song':
+      return 'AI Song';
+    case 'dj_outro':
+      return 'Outro';
+    default:
+      return 'Playing';
+  }
+}
+
+export function NowPlayingPanel({ track, isDJPlaying, djSegment }: NowPlayingPanelProps) {
+  if (!track && !isDJPlaying) {
     return (
       <aside className="hidden w-80 flex-shrink-0 flex-col bg-zinc-900 p-4 lg:flex rounded-lg">
         <div className="flex flex-1 items-center justify-center">
@@ -19,11 +36,53 @@ export function NowPlayingPanel({ track, isDJPlaying }: NowPlayingPanelProps) {
     );
   }
 
+  // DJ Mode - show DJ avatar and info
+  if (isDJPlaying) {
+    return (
+      <aside className="hidden w-80 flex-shrink-0 flex-col overflow-y-auto bg-zinc-900 lg:flex rounded-lg transition-shadow duration-300 animate-dj-glow">
+        {/* Header */}
+        <div className="flex items-center justify-between p-4">
+          <span className="text-sm font-bold text-purple-400">DJ Minimax</span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-purple-300 bg-purple-900/50 px-2 py-1 rounded-full">
+              LIVE
+            </span>
+          </div>
+        </div>
+
+        {/* DJ Avatar - centered */}
+        <div className="flex items-center justify-center mx-4 aspect-square">
+          <DJAvatar size="lg" isSpeaking={true} />
+        </div>
+
+        {/* DJ Info */}
+        <div className="p-4">
+          <div className="flex items-start justify-between">
+            <div className="min-w-0 flex-1">
+              <h3 className="truncate text-xl font-bold text-white">DJ Minimax</h3>
+              <p className="mt-1 truncate text-sm text-purple-400">
+                Now Playing: {getDJSegmentLabel(djSegment)}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* DJ Description */}
+        <div className="p-4 pt-0">
+          <p className="text-sm text-zinc-400">
+            Your AI radio DJ is creating a personalized experience based on your music taste.
+          </p>
+        </div>
+      </aside>
+    );
+  }
+
+  // Normal track mode
   return (
-    <aside className={`hidden w-80 flex-shrink-0 flex-col overflow-y-auto bg-zinc-900 lg:flex rounded-lg transition-shadow duration-300 ${isDJPlaying ? 'animate-dj-glow' : ''}`}>
+    <aside className="hidden w-80 flex-shrink-0 flex-col overflow-y-auto bg-zinc-900 lg:flex rounded-lg transition-shadow duration-300">
       {/* Header */}
       <div className="flex items-center justify-between p-4">
-        <span className="text-sm font-bold text-white">{track.artist}</span>
+        <span className="text-sm font-bold text-white">{track!.artist}</span>
         <div className="flex items-center gap-2">
           <button className="text-zinc-400 hover:text-white">
             <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
@@ -41,8 +100,8 @@ export function NowPlayingPanel({ track, isDJPlaying }: NowPlayingPanelProps) {
       {/* Large Album Art */}
       <div className="relative mx-4 aspect-square overflow-hidden rounded-lg">
         <Image
-          src={track.albumArt}
-          alt={track.album}
+          src={track!.albumArt}
+          alt={track!.album}
           fill
           className="object-cover"
           unoptimized
@@ -53,9 +112,9 @@ export function NowPlayingPanel({ track, isDJPlaying }: NowPlayingPanelProps) {
       <div className="p-4">
         <div className="flex items-start justify-between">
           <div className="min-w-0 flex-1">
-            <h3 className="truncate text-xl font-bold text-white">{track.title}</h3>
+            <h3 className="truncate text-xl font-bold text-white">{track!.title}</h3>
             <p className="mt-1 truncate text-sm text-zinc-400 hover:text-white hover:underline cursor-pointer">
-              {track.artist}
+              {track!.artist}
             </p>
           </div>
           <button className="ml-4 text-green-500 hover:text-green-400">
@@ -80,7 +139,7 @@ export function NowPlayingPanel({ track, isDJPlaying }: NowPlayingPanelProps) {
           <div className="flex items-center gap-3 rounded-md p-2 hover:bg-zinc-800/50 cursor-pointer">
             <div className="relative h-12 w-20 flex-shrink-0 overflow-hidden rounded bg-zinc-800">
               <Image
-                src={track.albumArt}
+                src={track!.albumArt}
                 alt="Video thumbnail"
                 fill
                 className="object-cover opacity-70"
@@ -93,15 +152,15 @@ export function NowPlayingPanel({ track, isDJPlaying }: NowPlayingPanelProps) {
               </div>
             </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium text-white">{track.title}</p>
-              <p className="truncate text-xs text-zinc-400">{track.artist} • Official Video</p>
+              <p className="truncate text-sm font-medium text-white">{track!.title}</p>
+              <p className="truncate text-xs text-zinc-400">{track!.artist} • Official Video</p>
             </div>
           </div>
 
           <div className="flex items-center gap-3 rounded-md p-2 hover:bg-zinc-800/50 cursor-pointer">
             <div className="relative h-12 w-20 flex-shrink-0 overflow-hidden rounded bg-zinc-800">
               <Image
-                src={track.albumArt}
+                src={track!.albumArt}
                 alt="Video thumbnail"
                 fill
                 className="object-cover opacity-70"
@@ -114,8 +173,8 @@ export function NowPlayingPanel({ track, isDJPlaying }: NowPlayingPanelProps) {
               </div>
             </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium text-white">{track.title} (Live)</p>
-              <p className="truncate text-xs text-zinc-400">{track.artist} • Live Performance</p>
+              <p className="truncate text-sm font-medium text-white">{track!.title} (Live)</p>
+              <p className="truncate text-xs text-zinc-400">{track!.artist} • Live Performance</p>
             </div>
           </div>
         </div>
@@ -126,7 +185,7 @@ export function NowPlayingPanel({ track, isDJPlaying }: NowPlayingPanelProps) {
         <h4 className="text-sm font-bold text-white">Credits</h4>
         <div className="mt-3 space-y-2">
           <div>
-            <p className="text-sm text-white">{track.artist}</p>
+            <p className="text-sm text-white">{track!.artist}</p>
             <p className="text-xs text-zinc-400">Main Artist</p>
           </div>
         </div>
