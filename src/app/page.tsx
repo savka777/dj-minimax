@@ -56,19 +56,23 @@ export default function Home() {
 
   // Inject DJ content when ready
   useEffect(() => {
+    console.log('[Home] DJ injection check:', { djStatus, hasDJContent: !!djContent, injected: djInjectedRef.current });
+
     if (djStatus === 'ready' && djContent && !djInjectedRef.current) {
       djInjectedRef.current = true;
       console.log('[Home] Injecting DJ content:', djContent.length, 'items');
 
       // Pause Spotify if it's playing
       if (spotifyPlayer.isPlaying) {
+        console.log('[Home] Pausing Spotify');
         spotifyPlayer.pause();
       }
 
-      // Insert DJ content and start playing it via fallback player
-      fallbackPlayer.insertAfterCurrent(djContent);
+      // Set queue to DJ content and it will auto-play the first item
+      console.log('[Home] Setting queue to DJ content');
+      fallbackPlayer.setQueue(djContent);
     }
-  }, [djStatus, djContent, fallbackPlayer.insertAfterCurrent, spotifyPlayer]);
+  }, [djStatus, djContent, fallbackPlayer.setQueue, spotifyPlayer]);
 
   // Determine which player state to use
   // Use Spotify for authenticated users, fallback player otherwise
@@ -117,6 +121,9 @@ export default function Home() {
 
   // Handle track selection - play via Spotify if authenticated
   const handleTrackSelect = (track: SpotifyTrack, index: number) => {
+    console.log('[Page] handleTrackSelect called, index:', index, 'trackPlayCount:', trackPlayCount);
+    setTrackPlayCount(prev => prev + 1);  // Increment play count for DJ trigger
+
     if (useSpotify && track.spotifyUrl) {
       // Extract track URI from spotifyUrl or use the track ID
       const spotifyUri = `spotify:track:${track.id}`;

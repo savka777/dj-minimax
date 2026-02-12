@@ -81,6 +81,14 @@ export function useDJGeneration(
       !generationStartedRef.current &&
       options.artists.length > 0;
 
+    console.log('[DJ Generation] Check:', {
+      currentIndex,
+      triggerIndex,
+      generationStarted: generationStartedRef.current,
+      artistsCount: options.artists.length,
+      shouldTrigger,
+    });
+
     if (shouldTrigger) {
       generationStartedRef.current = true;
       console.log('[DJ Generation] Triggering with hardcoded content for demo');
